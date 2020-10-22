@@ -5,8 +5,10 @@ const _ = require('underscore');
 
 
 const Usuario = require('../models/usuario');
+const { verificaToken, verificaAdminRole } = require('../middlewares/autenticacion');
 
-app.get('/usuario', function(req, res) {
+
+app.get('/usuario', verificaToken, (req, res) => {
     let desde = req.query.desde || 0;
     desde = Number(desde);
     let limite = req.query.limite || 5;
@@ -23,8 +25,9 @@ app.get('/usuario', function(req, res) {
                     err
                 })
             }
+            //Collection.countDocuments
             // Usuario.count({google:true}, (err, conteo) => {
-            Usuario.count({ estado: true }, (err, conteo) => {
+            Usuario.countDocuments({ estado: true }, (err, conteo) => {
                 res.json({
                     ok: true,
                     usuarios,
@@ -37,34 +40,33 @@ app.get('/usuario', function(req, res) {
 });
 
 //para crear data
-app.post('/usuario', function(req, res) {
-    let body = req.body;
+app.post('/usuario', []], (req, res) => {
+let body = req.body;
 
-    let usuario = new Usuario({
-        nombre: body.nombre,
-        email: body.email,
-        password: bcrypt.hashSync(body.password, 10),
-        role: body.role
-    });
+let usuario = new Usuario({
+    nombre: body.nombre,
+    email: body.email,
+    password: bcrypt.hashSync(body.password, 10),
+    role: body.role
+});
 
-    usuario.save((err, usuarioDB) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            })
-        }
-        //usuarioDB.password = null;
-
-        res.json({
-            ok: true,
-            cusuario: usuarioDB
+usuario.save((err, usuarioDB) => {
+    if (err) {
+        return res.status(400).json({
+            ok: false,
+            err
         })
-    });
+    }
+    //usuarioDB.password = null;
+
+    res.json({
+        ok: true,
+        cusuario: usuarioDB
+    })
+});
 });
 // put para actualizar data
-
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', [verificaToken, verificaAdminRole], (req, res) => {
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
 
@@ -86,7 +88,7 @@ app.put('/usuario/:id', function(req, res) {
 
 });
 
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [verificaToken, verificaAdminRole], (req, res) => {
     let id = req.params.id;
 
     let cambiaEstado = {
