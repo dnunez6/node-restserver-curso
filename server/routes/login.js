@@ -7,8 +7,6 @@ const Usuario = require('../models/usuario');
 app.post('/login', (req, res) => {
 
     let body = req.body;
-    // console.log(body.email);
-    // console.log(body.password);
     Usuario.findOne({ email: body.email }, (err, usuarioDB) => {
         if (err) {
             return res.status(400).json({
@@ -16,7 +14,6 @@ app.post('/login', (req, res) => {
                 err
             })
         }
-        // console.log(usuarioDB);
         if (!usuarioDB) {
             return res.status(400).json({
                 ok: false,
@@ -25,7 +22,6 @@ app.post('/login', (req, res) => {
                 }
             });
         }
-        // console.log(bcrypt.compareSync(body.password, usuarioDB.password));
         if (!bcrypt.compareSync(body.password, usuarioDB.password)) {
             return res.status(400).json({
                 ok: false,
