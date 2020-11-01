@@ -61,7 +61,7 @@ app.post('/usuario', [], (req, res) => {
 
         res.json({
             ok: true,
-            cusuario: usuarioDB
+            usuario: usuarioDB
         })
     });
 });
